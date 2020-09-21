@@ -6,7 +6,6 @@ import AttachFile from "@material-ui/icons/AttachFile";
 import MoreVert from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from '@material-ui/icons/Mic';
-import { useParams } from 'react-router-dom';
 import db from './firebase';
 
 const Chat = () => {
