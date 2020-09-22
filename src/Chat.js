@@ -7,6 +7,7 @@ import MoreVert from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 import MicIcon from '@material-ui/icons/Mic';
 import db from './firebase';
+import { useParams } from 'react-router-dom';
 
 const Chat = () => {
     
@@ -24,7 +25,7 @@ const Chat = () => {
 
     useEffect(() => {
      setSeed(Math.floor(Math.random() * 500));
-    },[])
+    },[roomId])
     const sendMessage = (e) => {
       e.preventDefault();
       console.log("You typed >>>", input);
@@ -35,7 +36,7 @@ const Chat = () => {
             <div className="Chat__header">
               <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
               <div className="Chat__headerInfo">
-                <h3>Room name</h3>
+                <h3>{roomName}</h3>
                 <p>Last seen at ...</p>
               </div>
               <div className="Chat__headerRight">
