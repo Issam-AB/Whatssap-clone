@@ -10,66 +10,80 @@ import db from './firebase';
 import { useParams } from 'react-router-dom';
 
 const Chat = () => {
-    
-    const [seed, setSeed] = useState('');
-    const [input, setInput] = useState('');
-    const { roomId } = useParams();
-    const [roomName, setRomName] = useState("");
 
-    useEffect(() => {
-     if(roomId) {
-       db.collection("rooms").doc(roomId)
-       .onSnapshot((snapshot) => setRomName(snapshot.data().name));
-     }
-    },[roomId])
+  const [seed, setSeed] = useState('');
+  const [input, setInput] = useState('');
+  const { roomId } = useParams();
+  const [roomName, setRomName] = useState("");
+  const [messages, setMessages] = useState([]);
 
-    useEffect(() => {
-     setSeed(Math.floor(Math.random() * 500));
-    },[roomId])
-    const sendMessage = (e) => {
-      e.preventDefault();
-      console.log("You typed >>>", input);
-      setInput('');
+  useEffect(() => {
+    if (roomId) {
+
+      db.collection("rooms").doc(roomId)
+        .onSnapshot((snapshot) => setRomName(snapshot.data().name));
+
+      db.collection("rooms").doc(roomId)
+        .collection("message").orderBy("timestamp", "asc")
+        .onSnapshot((snapshot) => {
+          setMessages(snapshot.docs.map((doc) =>
+          doc.data()
+        ))
+        })
     }
-    return (
-        <div className="Chat">
-            <div className="Chat__header">
-              <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
-              <div className="Chat__headerInfo">
-                <h3>{roomName}</h3>
-                <p>Last seen at ...</p>
-              </div>
-              <div className="Chat__headerRight">
-                <IconButton>
-                  <SearchOutLined/>
-                </IconButton>
-                <IconButton>
-                  <AttachFile />
-                </IconButton>
-                <IconButton>
-                    <MoreVert />
-                </IconButton>
-              </div>
-            </div>
+    console.log(messages)
+  },[roomId])
 
-            <div className="Chat__body">
-               <p className={`Chat__message ${true &&
-                "Chat_reciever"}`}>
-               <span className="Chat__name">Issam Aboulfadl</span>
-                hey guys
-                <span className="Chat__timestamp">3:52pm</span> </p>
-            </div>
 
-            <div className="Chat__footer">
-                <InsertEmoticonIcon />
-                <form>
-                    <input value={input} onChange={(e) => setInput(e.target.value)} type="text"/>
-                    <button onClick={sendMessage} type="submit">Send a message</button>
-                </form>
-                <MicIcon />
-            </div>
+  useEffect(() => {
+    setSeed(Math.floor(Math.random() * 500));
+  }, [roomId])
+  const sendMessage = (e) => {
+    e.preventDefault();
+    console.log("You typed >>>", input);
+    setInput('');
+  }
+  return (
+    <div className="Chat">
+      <div className="Chat__header">
+        <Avatar src={`https://avatars.dicebear.com/api/human/${seed}.svg`} />
+        <div className="Chat__headerInfo">
+          <h3>{roomName}</h3>
+          <p>Last seen at ...</p>
         </div>
-    )
+        <div className="Chat__headerRight">
+          <IconButton>
+            <SearchOutLined />
+          </IconButton>
+          <IconButton>
+            <AttachFile />
+          </IconButton>
+          <IconButton>
+            <MoreVert />
+          </IconButton>
+        </div>
+      </div>
+
+      <div className="Chat__body">
+        {messages.map(message => (
+          <p className={`Chat__message ${true &&
+            "Chat_reciever"}`}>
+            <span className="Chat__name">{message.name}</span>
+            {message.message}
+            <span className="Chat__timestamp">{new Date(message.timestamp.toDate()).toUTCString()}</span> </p>
+        ))}
+      </div>
+
+      <div className="Chat__footer">
+        <InsertEmoticonIcon />
+        <form>
+          <input value={input} onChange={(e) => setInput(e.target.value)} type="text" />
+          <button onClick={sendMessage} type="submit">Send a message</button>
+        </form>
+        <MicIcon />
+      </div>
+    </div>
+  )
 }
 
 export default Chat
